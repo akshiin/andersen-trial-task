@@ -18,7 +18,7 @@ For real-world scalability, this engine is designed with a **Hybrid Architecture
 
 ### 3. Progressive Capability Progression
 
-The project is built sequentially. `q1` resolves policy changes via endorsements. `q3` handles standalone financial math. `q4` injects an operational exclusion filter (catching temporal waiting periods and pre-authorisation penalties). `q5` chains everything together inside a stateful ledger that depletes individual benefit sub-limits and the overarching annual aggregate ceiling chronologically.
+The project is built sequentially. `q1` resolves policy changes via endorsements. `q3` handles standalone financial math. `q4` injects an operational exclusion filter (catching temporal waiting periods and pre-authorisation penalties). `q5` chains everything together inside a stateful ledger that depletes individual benefit sub-limits and the overarching annual aggregate ceiling chronologically. `q6` produces a structured settlement statement — one row per claim with the full financial breakdown — exported as both a machine-readable JSON file and a human-readable CSV table.
 
 ---
 
@@ -52,6 +52,7 @@ andersen-trial-task/
 ├── q3.py                  # Entry point: Single-claim settlement calculation (Question 3)
 ├── q4.py                  # Entry point: Batch adjudication + policy exclusions (Question 4)
 ├── q5.py                  # Entry point: Stateful sequential adjudication engine (Question 5)
+├── q6.py                  # Entry point: Structured settlement statement — JSON + CSV output (Question 6)
 └── securehealth/          # Shared core domain package
     ├── __init__.py        # Re-exports public services and domain types
     ├── models/            # Pydantic domain models (Split by concept, not by question)
@@ -65,7 +66,7 @@ andersen-trial-task/
     │   ├── endorsement.py # Endorsement E1 parameter transformation logic
     │   ├── settlement.py  # Core GC-1 calculation pipeline implementation
     │   ├── adjudication.py# Policy exclusion and penalty evaluation filters
-    │   └── stateful_adjudication.py # Stateful adjudication engine with limit tracking
+    │   └── stateful_adjudication.py # Stateful adjudication engine + settlement statement builder
     └── data/              # Centralized testing data and policy fixtures
         ├── __init__.py    # Central entry point for centralized data
         └── fixtures.py    # Policy rules, Endorsement E1, and Claims C1–C6 datasets
@@ -76,7 +77,7 @@ andersen-trial-task/
 
 ## Entry Point Mapping & Execution
 
-The top-level scripts (`q1.py` through `q5.py`) act as thin runnable interfaces. They extract centralized fixture data, route payloads through their designated service layers, and print structured outputs (clean JSON formatting for questions 3 to 5).
+The top-level scripts (`q1.py` through `q6.py`) act as thin runnable interfaces. They extract centralized fixture data, route payloads through their designated service layers, and print structured outputs (clean JSON formatting for questions 3 to 5; file output for question 6).
 
 | Script | Question Target | Internal Modules Called | Primary Objective |
 | --- | --- | --- | --- |
@@ -85,6 +86,7 @@ The top-level scripts (`q1.py` through `q5.py`) act as thin runnable interfaces.
 | `q3.py` | Single-Claim Settlement | `settlement.calculate_single_claim` | Processes Claim **C1** through the GC-1 order of calculation, computing the exact deductible and 10% network coinsurance split.
 | `q4.py` | Batch Exclusions | `adjudication.process_all_claims` | Loops sequentially through all claims (C1–C6) to flag non-payable files, applying temporal chronic filters (Exclusion 4.2) and operational penalties (GC-3).
 | `q5.py` | Stateful Adjudication | `stateful_adjudication.StatefulAdjudicationEngine` | Executes the complete chronological calculation loop across all six claims, updating dynamic sub-limits and the aggregate limit pool after each step.
+| `q6.py` | Settlement Statement | `stateful_adjudication.build_settlement_statement` | Produces a full per-claim settlement statement (billed, eligible, deductible, coinsurance, insurer-paid, member-paid, decision/reason) plus year totals, written to `settlement_statement.json` and `settlement_statement.csv`.
 
 ### Running the Engine Locally
 
@@ -102,6 +104,9 @@ uv run python q1.py
 uv run python q3.py
 uv run python q5.py
 
+# Run q6 to generate settlement_statement.json and settlement_statement.csv
+uv run python q6.py
+
 ```
 
 ---
@@ -111,7 +116,7 @@ uv run python q5.py
 The system's modular dependencies flow strictly downwards, guaranteeing a clean separation of concerns:
 
 ```
-[Entry Points]            q1.py … q5.py (Orchestrate and output JSON to console)
+[Entry Points]            q1.py … q6.py (Orchestrate and output JSON to console; q6 writes JSON + CSV files)
                                 │
                                 ▼
 [Business Logic]   securehealth/services/ (Pure functions for math & exclusion filters)
