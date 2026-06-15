@@ -81,20 +81,10 @@ The top-level scripts (`q1.py` through `q5.py`) act as thin runnable interfaces.
 | Script | Question Target | Internal Modules Called | Primary Objective |
 | --- | --- | --- | --- |
 | `q1.py` | Endorsement Resolution | `endorsement.resolve_q1_terms` | Compares and outputs Physiotherapy sub-limit and coinsurance rules before and after applying Endorsement E1.
-
- |
 | `q2.py` | Aggregate Initialisation | `models.policy.PolicyConfig` | Generates a clean policy configuration state and extracts the base aggregate limit (AED 250,000).
-
- |
 | `q3.py` | Single-Claim Settlement | `settlement.calculate_single_claim` | Processes Claim **C1** through the GC-1 order of calculation, computing the exact deductible and 10% network coinsurance split.
-
- |
 | `q4.py` | Batch Exclusions | `adjudication.process_all_claims` | Loops sequentially through all claims (C1–C6) to flag non-payable files, applying temporal chronic filters (Exclusion 4.2) and operational penalties (GC-3).
-
- |
 | `q5.py` | Stateful Adjudication | `stateful_adjudication.StatefulAdjudicationEngine` | Executes the complete chronological calculation loop across all six claims, updating dynamic sub-limits and the aggregate limit pool after each step.
-
- |
 
 ### Running the Engine Locally
 
