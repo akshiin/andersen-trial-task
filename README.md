@@ -4,41 +4,37 @@
 
 ### 1. Rules-as-Data Architecture
 
-Instead of hardcoding policy parameters (such as a 10% coinsurance rate or an AED 50 deductible) inside the logical code loops, this engine treats policy configurations purely as structured, immutable datasets using **Pydantic v2**. The adjudication functions are completely decoupled from individual values; modifying an endorsement or swapping to a different insurance plan is accomplished by instantiating a new data configuration block, leaving the mathematical core pristine and enabling the generalisation for unseen members.
+Policy parameters (like a 10% coinsurance rate or an AED 50 deductible) are not written directly into the code logic. Instead, this engine stores all policy settings as structured, read-only data objects using **Pydantic v2**. The calculation functions never depend on specific values. To change an endorsement or switch to a different plan, you just create a new data object — the math code stays the same and works for any member.
 
 ### 2. Hybrid Automation Strategy
 
-For real-world scalability, this engine is designed with a **Hybrid Architecture** mindset:
+This engine is built to scale in the real world using a **Hybrid Architecture**:
 
-* **The Input Layer (Deterministic Schemas):** Raw, unstructured data from medical bills or invoices is parsed and validated into strictly typed `Claim` payloads, eliminating human input or LLM hallucination errors on critical data fields like service dates and network types.
+* **The Input Layer (Deterministic Schemas):** Raw data from medical bills or invoices is read and checked against strict typed `Claim` schemas. This removes errors from manual input or AI-generated guesses on important fields like service dates and network types.
 
-* **The Processing Core (Deterministic Python Logic):** The actual mathematical ledger calculations follow a strict, sequential pipeline mirroring the policy wording's **GC-1 Order of Calculation** (Base Eligibility $\rightarrow$ Deductible Subtraction $\rightarrow$ Coinsurance Splits $\rightarrow$ Dynamic Limit Checks). A probabilistic LLM should never calculate financial payouts; this code guarantees 100% predictable, auditable figures down to the exact cent.
+* **The Processing Core (Deterministic Python Logic):** All financial calculations follow a fixed, step-by-step pipeline that matches the policy's **GC-1 Order of Calculation** (Base Eligibility $\rightarrow$ Deductible Subtraction $\rightarrow$ Coinsurance Splits $\rightarrow$ Dynamic Limit Checks).
 
-* **The Output Layer (User Explanation Generation):** The engine yields a highly structured JSON settlement ledger complete with native code-generated `rule_justifications`. This transparent output is structured to easily integrate into downstream LLMs to auto-generate empathetic, plain-language customer letters or explanation dashboards.
-
-### 3. Progressive Capability Progression
-
-The project is built sequentially. `q1` resolves policy changes via endorsements. `q3` handles standalone financial math. `q4` injects an operational exclusion filter (catching temporal waiting periods and pre-authorisation penalties). `q5` chains everything together inside a stateful ledger that depletes individual benefit sub-limits and the overarching annual aggregate ceiling chronologically. `q6` produces a structured settlement statement — one row per claim with the full financial breakdown — exported as both a machine-readable JSON file and a human-readable CSV table.
+* **The Output Layer (User Explanation Generation):** The engine produces a structured JSON settlement record with `rule_justifications` generated directly by the code. This output is easy to pass into an LLM to create plain-language letters or explanation dashboards for customers.
 
 ---
 
 ## Why Naive Vector-Search/RAG Approaches Fail on This Task
 
-A typical vector-search (RAG) or an unstructured LLM-agent-router approach is highly brittle and will fail to deliver the rigorous audit trails required for health-insurance claim adjudication for the following reasons:
+A standard vector-search (RAG) or LLM-agent approach is too unreliable for health-insurance claim adjudication and will not produce the accurate audit trails this work requires. Here is why:
 
-1. **Context Window Fragmentation & Shadow Overrides:** RAG divides documents into chunks. If an engine pulls a baseline benefit limit (e.g., Physiotherapy standard limit) from one page chunk, it will likely miss an Endorsement clause located on a separate page chunk that fundamentally overrides that value.
-
-
-2. **Lack of Chronological State Awareness:** Policy limits and annual aggregate caps deplete continuously across a timeline. Linguistic LLMs do not possess an internal, stateful memory machine capable of tracking precise historical math accumulators across multiple distinct claim calculations.
+1. **Context Window Fragmentation & Shadow Overrides:** RAG splits documents into chunks. If the engine picks up a base benefit limit (e.g., the Physiotherapy cap) from one chunk, it will likely miss an Endorsement clause in a different chunk that changes that value.
 
 
-3. **Mathematical Instability:** Large Language Models are fundamentally statistical language prediction models, not arithmetic processors. They easily hallucinate or fail when executing complex order-of-operations loops involving consecutive deductible subtractions, coinsurance percentages, and sliding-scale caps.
+2. **Lack of Chronological State Awareness:** Policy limits and annual caps decrease over time as claims are processed. LLMs have no built-in mechanism to track running totals and balances across multiple separate claim calculations.
+
+
+3. **Mathematical Instability:** LLMs are text prediction models, not calculators. They often produce wrong numbers or fail entirely when asked to perform chained operations like deductible subtractions, coinsurance splits, and sliding-scale cap checks in sequence.
 
 ---
 
 ## Project Structure Overview
 
-The shared engine logic is contained inside the internal library `securehealth/`, which is separated cleanly into three distinct structural layers: **Models $\rightarrow$ Services $\rightarrow$ Data**. The entry scripts sit above this library to orchestrate execution and output telemetry.
+All shared engine logic lives in the `securehealth/` package, split into three layers: **Models $\rightarrow$ Services $\rightarrow$ Data**. The top-level scripts use this package to run each question and print results.
 
 ```
 andersen-trial-task/
@@ -77,20 +73,20 @@ andersen-trial-task/
 
 ## Entry Point Mapping & Execution
 
-The top-level scripts (`q1.py` through `q6.py`) act as thin runnable interfaces. They extract centralized fixture data, route payloads through their designated service layers, and print structured outputs (clean JSON formatting for questions 3 to 5; file output for question 6).
+The top-level scripts (`q1.py` through `q6.py`) are simple runners. They load the fixture data, pass it through the right service functions, and print the results (JSON output for questions 3 to 5; file output for question 6).
 
 | Script | Question Target | Internal Modules Called | Primary Objective |
 | --- | --- | --- | --- |
-| `q1.py` | Endorsement Resolution | `endorsement.resolve_q1_terms` | Compares and outputs Physiotherapy sub-limit and coinsurance rules before and after applying Endorsement E1.
-| `q2.py` | Aggregate Initialisation | `models.policy.PolicyConfig` | Generates a clean policy configuration state and extracts the base aggregate limit (AED 250,000).
-| `q3.py` | Single-Claim Settlement | `settlement.calculate_single_claim` | Processes Claim **C1** through the GC-1 order of calculation, computing the exact deductible and 10% network coinsurance split.
-| `q4.py` | Batch Exclusions | `adjudication.process_all_claims` | Loops sequentially through all claims (C1–C6) to flag non-payable files, applying temporal chronic filters (Exclusion 4.2) and operational penalties (GC-3).
-| `q5.py` | Stateful Adjudication | `stateful_adjudication.StatefulAdjudicationEngine` | Executes the complete chronological calculation loop across all six claims, updating dynamic sub-limits and the aggregate limit pool after each step.
-| `q6.py` | Settlement Statement | `stateful_adjudication.build_settlement_statement` | Produces a full per-claim settlement statement (billed, eligible, deductible, coinsurance, insurer-paid, member-paid, decision/reason) plus year totals, written to `settlement_statement.json` and `settlement_statement.csv`.
+| `q1.py` | Endorsement Resolution | `endorsement.resolve_q1_terms` | Shows the Physiotherapy sub-limit and coinsurance values before and after Endorsement E1 is applied.
+| `q2.py` | Aggregate Initialisation | `models.policy.PolicyConfig` | Creates a fresh policy config and prints the base aggregate limit (AED 250,000).
+| `q3.py` | Single-Claim Settlement | `settlement.calculate_single_claim` | Runs Claim **C1** through the GC-1 calculation steps and shows the deductible and 10% coinsurance split.
+| `q4.py` | Batch Exclusions | `adjudication.process_all_claims` | Processes all claims (C1–C6) one by one, marking which ones are not payable using the chronic condition filter (Exclusion 4.2) and late-submission penalty (GC-3).
+| `q5.py` | Stateful Adjudication | `stateful_adjudication.StatefulAdjudicationEngine` | Runs all six claims in order, updating sub-limits and the aggregate balance after each claim.
+| `q6.py` | Settlement Statement | `stateful_adjudication.build_settlement_statement` | Builds a full settlement report per claim (billed, eligible, deductible, coinsurance, insurer-paid, member-paid, decision/reason) with year-end totals, saved to `settlement_statement.json` and `settlement_statement.csv`.
 
 ### Running the Engine Locally
 
-This project leverages `uv` for lightning-fast, predictable dependency management. Follow these steps to sync your virtual environment and execute any targeted trial question runner:
+This project uses `uv` for fast and reliable dependency management. Run the steps below to set up your environment and execute any question script:
 
 ```bash
 # Clone the repository and navigate to the project root
@@ -113,7 +109,7 @@ uv run python q6.py
 
 ## Layered Architecture Pattern
 
-The system's modular dependencies flow strictly downwards, guaranteeing a clean separation of concerns:
+Each layer only depends on the layer below it, keeping the code clean and easy to change:
 
 ```
 [Entry Points]            q1.py … q6.py (Orchestrate and output JSON to console; q6 writes JSON + CSV files)
