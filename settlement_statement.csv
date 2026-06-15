@@ -1,0 +1,8 @@
+claim_id,service_date,benefit_name,network,billed_amount,eligible_amount,deductible,coinsurance_member_share,insurer_paid,member_paid,decision,reason
+C1,2025-02-15,Outpatient Consultation,In-Network,300.0,300.0,50.0,25.0,225.0,75.0,APPROVED,Meets all core policy coverage criteria.
+C2,2025-03-10,Outpatient Consultation,In-Network,400.0,0.0,0.0,0.0,0.0,400.0,DENIED,Section 4 — Clause 4.2: Treatment for declared Chronic/Pre-existing Condition (Asthma review (declared chronic condition)) is not covered during the first 6 months from the Inception Date.
+C3,2025-08-05,Outpatient Consultation,In-Network,400.0,400.0,50.0,35.0,315.0,85.0,APPROVED,Meets all core policy coverage criteria.
+C5,2025-10-03,Inpatient & Surgery,In-Network,18000.0,18000.0,0.0,0.0,14400.0,3600.0,PARTIALLY_DENIED,Section 3 — General Condition GC-3: Elective treatment undertaken without mandatory 48-hour Pre-authorisation results in a 20% payment reduction.
+C6,2025-11-20,Prescribed Medication,Out-of-Network,500.0,0.0,0.0,0.0,0.0,500.0,DENIED,Section 2 Table of Benefits: This benefit category is explicitly 'Not covered' when obtained Out-of-Network.
+C4,2025-12-12,Physiotherapy,In-Network,3000.0,3000.0,0.0,300.0,2700.0,300.0,APPROVED,Meets all core policy coverage criteria.
+YEAR TOTAL,,,,22600.0,21700.0,100.0,360.0,17640.0,4960.0,,"Remaining aggregate limit: AED 232,360.00"

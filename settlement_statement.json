@@ -1,0 +1,111 @@
+{
+    "claims": [
+        {
+            "claim_id": "C1",
+            "service_date": "2025-02-15",
+            "benefit_name": "Outpatient Consultation",
+            "network": "In-Network",
+            "billed_amount": 300.0,
+            "eligible_amount": 300.0,
+            "deductible": 50.0,
+            "coinsurance_member_share": 25.0,
+            "insurer_paid": 225.0,
+            "member_paid": 75.0,
+            "decision": "APPROVED",
+            "reason": "Meets all core policy coverage criteria."
+        },
+        {
+            "claim_id": "C2",
+            "service_date": "2025-03-10",
+            "benefit_name": "Outpatient Consultation",
+            "network": "In-Network",
+            "billed_amount": 400.0,
+            "eligible_amount": 0.0,
+            "deductible": 0.0,
+            "coinsurance_member_share": 0.0,
+            "insurer_paid": 0.0,
+            "member_paid": 400.0,
+            "decision": "DENIED",
+            "reason": "Section 4 \u2014 Clause 4.2: Treatment for declared Chronic/Pre-existing Condition (Asthma review (declared chronic condition)) is not covered during the first 6 months from the Inception Date."
+        },
+        {
+            "claim_id": "C3",
+            "service_date": "2025-08-05",
+            "benefit_name": "Outpatient Consultation",
+            "network": "In-Network",
+            "billed_amount": 400.0,
+            "eligible_amount": 400.0,
+            "deductible": 50.0,
+            "coinsurance_member_share": 35.0,
+            "insurer_paid": 315.0,
+            "member_paid": 85.0,
+            "decision": "APPROVED",
+            "reason": "Meets all core policy coverage criteria."
+        },
+        {
+            "claim_id": "C5",
+            "service_date": "2025-10-03",
+            "benefit_name": "Inpatient & Surgery",
+            "network": "In-Network",
+            "billed_amount": 18000.0,
+            "eligible_amount": 18000.0,
+            "deductible": 0.0,
+            "coinsurance_member_share": 0.0,
+            "insurer_paid": 14400.0,
+            "member_paid": 3600.0,
+            "decision": "PARTIALLY_DENIED",
+            "reason": "Section 3 \u2014 General Condition GC-3: Elective treatment undertaken without mandatory 48-hour Pre-authorisation results in a 20% payment reduction."
+        },
+        {
+            "claim_id": "C6",
+            "service_date": "2025-11-20",
+            "benefit_name": "Prescribed Medication",
+            "network": "Out-of-Network",
+            "billed_amount": 500.0,
+            "eligible_amount": 0.0,
+            "deductible": 0.0,
+            "coinsurance_member_share": 0.0,
+            "insurer_paid": 0.0,
+            "member_paid": 500.0,
+            "decision": "DENIED",
+            "reason": "Section 2 Table of Benefits: This benefit category is explicitly 'Not covered' when obtained Out-of-Network."
+        },
+        {
+            "claim_id": "C4",
+            "service_date": "2025-12-12",
+            "benefit_name": "Physiotherapy",
+            "network": "In-Network",
+            "billed_amount": 3000.0,
+            "eligible_amount": 3000.0,
+            "deductible": 0.0,
+            "coinsurance_member_share": 300.0,
+            "insurer_paid": 2700.0,
+            "member_paid": 300.0,
+            "decision": "APPROVED",
+            "reason": "Meets all core policy coverage criteria."
+        }
+    ],
+    "year_totals": {
+        "total_billed": 22600.0,
+        "total_eligible": 21700.0,
+        "total_deductible": 100.0,
+        "total_coinsurance_member_share": 360.0,
+        "total_insurer_paid": 17640.0,
+        "total_member_paid": 4960.0,
+        "remaining_aggregate_limit": 232360.0
+    },
+    "csv_fields": [
+        "claim_id",
+        "service_date",
+        "benefit_name",
+        "network",
+        "billed_amount",
+        "eligible_amount",
+        "deductible",
+        "coinsurance_member_share",
+        "insurer_paid",
+        "member_paid",
+        "decision",
+        "reason"
+    ]
+}
